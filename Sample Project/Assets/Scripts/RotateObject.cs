@@ -1,19 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PalaboraShot : MonoBehaviour
+public class RotateObject : MonoBehaviour
 {
-    void Update()
+    [SerializeField] private float _rotateSpeed;
+
+    private float angle;
+
+    private void Update()
     {
-        if (Input.GetKey(KeyCode.Z))
+        if(RotateButton.onButtonDown)
         {
-            transform.rotation = Quaternion.Euler(60, transform.root.eulerAngles.y, 0);
+            angle += _rotateSpeed * Time.deltaTime;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
         }
 
-        if (Input.GetKeyUp(KeyCode.Z))
-        {
-            transform.rotation = Quaternion.Euler(90, transform.root.eulerAngles.y, 0);
-        }
+        
     }
 }

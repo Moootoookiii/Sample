@@ -21,6 +21,11 @@ public class AnimalGenerator : MonoBehaviour
     public bool isGene;//生成されているか
     public bool isFall;//生成された動物が落下中か
 
+    [SerializeField] private float _rotateSpeed;
+    private float angle;
+
+    private List<GameObject> animalList = new List<GameObject>();
+
     private void Start()
     {
         Init();
@@ -85,6 +90,14 @@ public class AnimalGenerator : MonoBehaviour
 
             geneAnimal.transform.position = v;
         }
+
+        if (RotateButton.onButtonDown)
+        {
+            angle += _rotateSpeed * Time.deltaTime;
+            geneAnimal.transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
+
+
     }
 
     /// <summary>
@@ -111,11 +124,17 @@ public class AnimalGenerator : MonoBehaviour
         while (CameraController.isCollision)
         {
             yield return new WaitForEndOfFrame();//フレームの終わりまで待つ（無いと無限ループ）
-            mainCamera.transform.Translate(0, 0.1f, 0);//カメラを少し上に移動
+
+            //mainCamera.transform.Translate(0, 0.1f, 0);//カメラを少し上に移動
+            ChangeCameraPositionY();
+
             pivotHeight += 0.1f;//生成位置も少し上に移動
         }
         geneAnimal = Instantiate(animals[Random.Range(0, animals.Length)], new Vector2(0, pivotHeight), Quaternion.identity);//回転せずに生成
         geneAnimal.GetComponent<Rigidbody2D>().isKinematic = true;//物理挙動をさせない状態にする
+
+        // 生成したどうぶつをListにとうろく
+        animalList.Add(geneAnimal);
     }
 
     /// <summary>
@@ -127,6 +146,27 @@ public class AnimalGenerator : MonoBehaviour
         if (!isFall)
             geneAnimal.transform.Rotate(0, 0, -30);//30度ずつ回転
     }
+
+
+    // カメラの高さを変更
+    private void ChangeCameraPositionY()
+    {
+        float maxHeight = 0f;
+
+        foreach (GameObject animal in animalList)
+        {
+            float animalHeight = animal.transform.position.y;
+
+            if(maxHeight < animalHeight)
+            {
+                maxHeight = animalHeight;
+            }
+        }
+
+
+        mainCamera.transform.position = new Vector3(mainCamera.transform.position.x, maxHeight, mainCamera.transform.position.z);
+    }
+
 
     /// <summary>
     /// リトライボタン
